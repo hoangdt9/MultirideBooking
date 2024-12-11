@@ -56,58 +56,6 @@ const PaymentComponent: React.FC<PaymentComponentProps> = ({ dataTickes }) => {
     );
   };
 
-  /* const handlePaymentUpdate = async () => {
-    try {
-      const id = dataTickes._id;
-      console.log(value); // Phương thức thanh toán đã chọn
-      console.log(id); // ID của vé
-
-      console.log(token); // Token xác thực
-
-      // Gửi phương thức thanh toán lên API
-      const result = await updatePaymentMethod(id, value, token);
-      console.log("Payment method updated successfully:", result);
-
-      // Kiểm tra nếu phương thức thanh toán là ZALOPAY, lấy URL thanh toán
-      if (value === "ZALOPAY" && result && result.order_url) {
-        // Mở URL thanh toán ZaloPay trong trình duyệt di động
-        Linking.openURL(result.order_url).catch((err) => {
-          console.error("Failed to open URL:", err);
-        });
-      }
-
-      // Bạn có thể làm gì đó sau khi thành công, ví dụ điều hướng người dùng hoặc thông báo
-    } catch (error) {
-      console.error("Failed to update payment method:", error);
-    }
-  }; */
-  /* const handlePaymentUpdate1 = async () => {
-    try {
-      const id = dataTickes._id;
-      console.log(value); // Phương thức thanh toán đã chọn
-      console.log(id); // ID của vé
-
-      console.log(token); // Token xác thực
-
-      // Gửi phương thức thanh toán lên API
-      const result = await updatePaymentMethod(id, value, token);
-      console.log("Payment method updated successfully:", result);
-
-      // Kiểm tra trạng thái thanh toán (giả sử result.paymentStatus là trạng thái thanh toán)
-      if (result.paymentStatus === "success") {
-        setPaymentStatus("Thanh toán thành công!");
-      } else {
-        setPaymentStatus("Thanh toán thất bại, vui lòng thử lại!");
-      }
-
-      // Hiển thị dialog sau khi kiểm tra trạng thái thanh toán
-      setShowDialog(true);
-    } catch (error) {
-      console.error("Failed to update payment method:", error);
-      setPaymentStatus("Có lỗi xảy ra trong quá trình thanh toán!");
-      setShowDialog(true);
-    }
-  }; */
   /* Khi bấm thanh toán */
   const handlePaymentUpdate = async () => {
     try {
@@ -124,7 +72,7 @@ const PaymentComponent: React.FC<PaymentComponentProps> = ({ dataTickes }) => {
       }
       const result = await updatePaymentMethod(id, value, token);
       console.log("Payment method updated successfully:", result);
-      console.log();
+      console.log("dataTickes", dataTickes);
 
       // Kiểm tra nếu phương thức thanh toán là ZALOPAY, lấy URL thanh toán
       if (value === "ZALOPAY" && result && result.order_url) {
@@ -155,6 +103,7 @@ const PaymentComponent: React.FC<PaymentComponentProps> = ({ dataTickes }) => {
       /* console.error("Failed to update payment method:", error); */
     }
   };
+
   return (
     <View style={styles.viewtwo}>
       {/* Thời gian giữ vé */}
@@ -224,6 +173,7 @@ const PaymentComponent: React.FC<PaymentComponentProps> = ({ dataTickes }) => {
         value={value}
         appTransId={appTransId}
         IdTickets={IdTickets}
+        dataTickes={dataTickes}
       />
     </View>
   );

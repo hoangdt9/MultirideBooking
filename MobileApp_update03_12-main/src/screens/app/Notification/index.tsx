@@ -2,8 +2,10 @@ import { Image, SafeAreaView, Text, View } from "react-native";
 import { styles } from "./style";
 import { FlashList } from "@shopify/flash-list";
 import Header from "../../../components/headerApp";
+import { getAllTickets, Ticket } from "../../../utils/AsyncStorage";
+import { useEffect, useState } from "react";
 
-interface Notifications {
+interface Notification {
   date: string;
   status: string;
   route: string;
@@ -12,27 +14,10 @@ interface Notifications {
   success: boolean;
 }
 
-const notifications: Notifications[] = [
-  {
-    date: "Thứ 6, 10/04/2024",
-    status: "Đặt vé thành công",
-    route: "Đà Nẵng - Quảng Ngãi",
-    time: "17:00, Thứ 6, 10/04/2024",
-    seats: "A12, A13",
-    success: true,
-  },
-  {
-    date: "Thứ 7, 11/04/2024",
-    status: "Đặt vé thất bại",
-    route: "Sài Gòn - Quy Nhơn",
-    time: "17:00, Thứ 7, 11/04/2024",
-    seats: "B7",
-    success: false,
-  },
-];
-
 const NotificationScreen = () => {
-  const renderItem = ({ item }: { item: Notifications }) => (
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const renderItem = ({ item }: { item: Notification }) => (
     <View style={styles.notificationContainer}>
       <Text style={styles.date}>{item.date}</Text>
       <View
@@ -60,6 +45,44 @@ const NotificationScreen = () => {
       </View>
     </View>
   );
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      const storedTickets = await getAllTickets();
+      console.log("Stored Tickets:", storedTickets);
+
+      // Map tickets to notifications
+      const tickets: Notification[] =
+        storedTickets?.map((ticket: Ticket) => {
+          const { status, route, departureTime, seat } = ticket;
+
+          return {
+            date: new Date(departureTime).toLocaleDateString("vi-VN", {
+              weekday: "long",
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            }), // Format as "Thứ 7, 11/04/2024"
+            status:
+              status === "success" ? "Đặt vé thành công" : "Đặt vé thất bại",
+            route: route || "Chưa xác định",
+            time:
+              new Date(departureTime).toLocaleTimeString("vi-VN", {
+                hour: "2-digit",
+                minute: "2-digit",
+              }) +
+              ", " +
+              new Date(departureTime).toLocaleDateString("vi-VN"),
+            seats: seat || "N/A",
+            success: status === "success",
+          };
+        }) || [];
+
+      setNotifications(tickets);
+    };
+
+    fetchNotifications();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>

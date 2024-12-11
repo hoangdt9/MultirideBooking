@@ -13,6 +13,7 @@ import { ImageSourcePropType } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack"; // Import StackNavigationProp
 import { RootStackParamList } from "../../screens/App.TicketBookingScreen/index";
+import { setTicketInfo, Ticket } from "../../utils/AsyncStorage";
 
 interface PopupProps {
   isVisible: boolean; // Điều khiển hiển thị modal
@@ -25,6 +26,7 @@ interface PopupProps {
   appTransId?: string;
   statusPay?: string;
   IdTickets?: string;
+  dataTickes?: any;
 }
 
 const Popup: React.FC<PopupProps> = ({
@@ -34,6 +36,7 @@ const Popup: React.FC<PopupProps> = ({
   paymentStatus,
   value,
   IdTickets,
+  dataTickes,
 }) => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const fadeAnim = new Animated.Value(0); // Điều khiển opacity
@@ -44,6 +47,18 @@ const Popup: React.FC<PopupProps> = ({
   const [imageSource, setImageSource] = useState<ImageSourcePropType | null>(
     null
   );
+
+  const { trip, seatNumber, _id } = dataTickes;
+  const { route, departureTime } = trip;
+  const { startProvince, endProvince } = route;
+
+  const ticket: Ticket = {
+    id: _id,
+    status: paymentStatus,
+    route: `${startProvince} - ${endProvince}`,
+    departureTime: departureTime,
+    seat: seatNumber?.[0],
+  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -152,6 +167,7 @@ const Popup: React.FC<PopupProps> = ({
         // Thực hiện hành động chuyển đến màn hình vé (ví dụ: navigation.navigate('Tickets'))
         if (IdTickets) {
           navigation.navigate("TicketDetails", { ticketId: IdTickets });
+          ticket.status = "success";
         } else {
           console.error("IdTickets is undefined.");
         }
@@ -173,6 +189,7 @@ const Popup: React.FC<PopupProps> = ({
         onClose(); // Đóng modal nếu không có hành động nào
         break;
     }
+    await setTicketInfo(ticket);
   };
 
   return (
